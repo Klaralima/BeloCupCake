@@ -3,9 +3,11 @@ annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
 certifi==2026.10.23
+cffi==2.1.1
 charset-normalizer==3.5.2
 click==8.5.0
 colorama==0.4.6
+cryptography==50.0.2
 detect-installer==0.2.1
 dnspython==2.9.1
 email-validator==2.3.0
@@ -34,11 +36,13 @@ opentelemetry-proto==1.45.2
 opentelemetry-sdk==1.45.2
 opentelemetry-semantic-conventions==0.66b2
 protobuf==7.36.2
+pycparser==3.12
 pydantic==2.14.2
 pydantic-extra-types==2.11.1
 pydantic-settings==2.16.2
 pydantic_core==2.50.2
 Pygments==2.21.0
+PyMySQL==1.2.3
 python-dotenv==1.2.4
 python-multipart==0.0.33
 PyYAML==6.0.3
@@ -48,6 +52,7 @@ rich-toolkit==0.20.6
 rignore==0.8.1
 sentry-sdk==2.73.0
 shellingham==1.5.4
+SQLAlchemy==2.1.6
 starlette==1.10.0
 truststore==0.10.5
 typer==0.27.3

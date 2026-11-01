@@ -1,14 +1,43 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.database import engine
+
 
 app = FastAPI(
-    title ="BeloCupCake API",
+    title="BeloCupCake API",
     description="API do projeto acadêmico BeloCupCake.",
     version="0.1.0",
 )
+
 
 @app.get("/health", tags=["Sistema"])
 def verificar_api():
     return {
         "status": "ok",
-        "aplicacao:": "BeloCupCake",
+        "aplicacao": "BeloCupCake",
+    }
+
+
+@app.get("/health/db", tags=["Sistema"])
+def verificar_banco():
+    try:
+        with engine.connect() as conexao:
+            conexao.execute(text("SELECT 1")).scalar_one()
+
+    except SQLAlchemyError as erro:
+        print(
+            "Falha na verificação do banco:",
+            type(erro).__name__,
+        )
+
+        raise HTTPException(
+            status_code=503,
+            detail="Banco de dados indisponível.",
+        ) from erro
+
+    return {
+        "status": "ok",
+        "banco": "conectado",
     }
