@@ -3,6 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import engine
+from app.routers.usuarios import router as usuarios_router
 
 
 app = FastAPI(
@@ -11,6 +12,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.include_router(usuarios_router)
 
 @app.get("/health", tags=["Sistema"])
 def verificar_api():

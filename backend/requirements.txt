@@ -2,6 +2,8 @@
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
+argon2-cffi==25.1.0
+argon2-cffi-bindings==26.1.0
 certifi==2026.10.23
 cffi==2.1.1
 charset-normalizer==3.5.2
@@ -36,6 +38,7 @@ opentelemetry-proto==1.45.2
 opentelemetry-sdk==1.45.2
 opentelemetry-semantic-conventions==0.66b2
 protobuf==7.36.2
+pwdlib==0.3.1
 pycparser==3.12
 pydantic==2.14.2
 pydantic-extra-types==2.11.1

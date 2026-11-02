@@ -33,3 +33,7 @@ class Base(DeclarativeBase):
 
 
 SessionLocal = sessionmaker(bind=engine)
+
+def obter_sessao():
+    with SessionLocal() as sessao:
+        yield sessao
