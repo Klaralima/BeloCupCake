@@ -50,3 +50,15 @@ def listar_produtos_disponiveis(
     )
 
     return list(sessao.scalars(consulta).all())
+
+def buscar_produto_disponivel(
+    sessao: Session,
+    produto_id: int,
+) -> Produto | None:
+    consulta = select(Produto).where(
+        Produto.id == produto_id,
+        Produto.ativo.is_(True),
+        Produto.estoque > 0,
+    )
+
+    return sessao.scalar(consulta)
