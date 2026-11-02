@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from app.models.produto import Produto
-from app.schemas.produto import ProdutoCriar
+from app.schemas.produto import ProdutoAtualizar, ProdutoCriar
 
 
 def cadastrar_produto(sessao: Session, dados: ProdutoCriar) -> Produto:
@@ -62,3 +62,34 @@ def buscar_produto_disponivel(
     )
 
     return sessao.scalar(consulta)
+
+def atualizar_produto(
+    sessao: Session,
+    produto_id: int,
+    dados: ProdutoAtualizar,
+) -> Produto | None:
+    produto = sessao.scalar(
+        select(Produto)
+        .where(Produto.id == produto_id)
+        .with_for_update()
+    )
+
+    if produto is None:
+        return None
+
+    alteracoes = dados.model_dump(exclude_unset=True)
+
+    if alteracoes.get("imagem_url") is not None:
+        alteracoes["imagem_url"] = str(alteracoes["imagem_url"])
+
+    for campo, valor in alteracoes.items():
+        setattr(produto, campo, valor)
+
+    try:
+        sessao.commit()
+    except SQLAlchemyError:
+        sessao.rollback()
+        raise
+
+    sessao.refresh(produto)
+    return produto

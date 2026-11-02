@@ -5,8 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.database import obter_sessao
 from app.dependencies import exigir_perfis
-from app.schemas.produto import ProdutoCriar, ProdutoResposta
+from app.schemas.produto import (
+    ProdutoAtualizar,
+    ProdutoCriar,
+    ProdutoResposta,
+)
 from app.services.produto import (
+    atualizar_produto,
     buscar_produto_disponivel,
     cadastrar_produto,
     listar_produtos_disponiveis,
@@ -55,6 +60,29 @@ def consultar_produto(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Produto não encontrado ou indisponível.",
+        )
+
+    return produto
+
+@router.patch(
+    "/{produto_id}",
+    response_model=ProdutoResposta,
+    dependencies=[Depends(exigir_perfis("ADMINISTRADOR"))],
+)
+def editar_produto(
+    produto_id: Annotated[
+        int,
+        Path(ge=1, le=18446744073709551615),
+    ],
+    dados: ProdutoAtualizar,
+    sessao: Annotated[Session, Depends(obter_sessao)],
+):
+    produto = atualizar_produto(sessao, produto_id, dados)
+
+    if produto is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Produto não encontrado.",
         )
 
     return produto
