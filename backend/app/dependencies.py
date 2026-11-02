@@ -52,3 +52,17 @@ def obter_usuario_atual(
         raise erro_autenticacao
 
     return usuario
+
+def exigir_perfis(*perfis_permitidos: str):
+    def verificar_perfil(
+        usuario: Annotated[Usuario, Depends(obter_usuario_atual)],
+    ) -> Usuario:
+        if usuario.perfil not in perfis_permitidos:
+            raise HTTPException(
+                status_code=403,
+                detail="Seu perfil não tem permissão para esta operação.",
+            )
+
+        return usuario
+
+    return verificar_perfil
