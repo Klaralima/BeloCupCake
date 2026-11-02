@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from dotenv import load_dotenv
 from sqlalchemy import URL, create_engine
 
@@ -27,3 +27,9 @@ engine = create_engine(
     pool_pre_ping=True,
     connect_args={"connect_timeout": 5},
 )
+
+class Base(DeclarativeBase):
+    pass
+
+
+SessionLocal = sessionmaker(bind=engine)
