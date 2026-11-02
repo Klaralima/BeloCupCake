@@ -6,6 +6,7 @@ from app.database import engine
 from app.routers.usuarios import router as usuarios_router
 from app.routers.autenticacao import router as autenticacao_router
 from app.routers.administracao import router as administracao_router
+from app.routers.produtos import router as produtos_router
 
 
 app = FastAPI(
@@ -17,6 +18,7 @@ app = FastAPI(
 app.include_router(usuarios_router)
 app.include_router(autenticacao_router)
 app.include_router(administracao_router)
+app.include_router(produtos_router)
 
 @app.get("/health", tags=["Sistema"])
 def verificar_api():
