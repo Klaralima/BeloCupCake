@@ -9,6 +9,8 @@ from app.services.usuario import (
     EmailJaCadastradoError,
     cadastrar_cliente,
 )
+from app.dependencies import obter_usuario_atual
+from app.models.usuario import Usuario
 
 
 router = APIRouter(prefix="/usuarios", tags=["Usuários"])
@@ -30,3 +32,9 @@ def criar_usuario(
             status_code=status.HTTP_409_CONFLICT,
             detail="E-mail já cadastrado.",
         ) from None
+
+@router.get("/me", response_model=UsuarioResposta)
+def consultar_meus_dados(
+    usuario: Annotated[Usuario, Depends(obter_usuario_atual)],
+):
+    return usuario
