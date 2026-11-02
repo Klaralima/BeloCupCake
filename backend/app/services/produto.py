@@ -93,3 +93,17 @@ def atualizar_produto(
 
     sessao.refresh(produto)
     return produto
+
+def listar_produtos_administracao(
+    sessao: Session,
+    limite: int,
+    deslocamento: int,
+) -> list[Produto]:
+    consulta = (
+        select(Produto)
+        .order_by(Produto.id)
+        .offset(deslocamento)
+        .limit(limite)
+    )
+
+    return list(sessao.scalars(consulta).all())
