@@ -267,3 +267,65 @@ def atualizar_status_preparo(
     except Exception:
         sessao.rollback()
         raise
+
+class CancelamentoPedidoInvalidoError(Exception):
+    pass
+
+
+def cancelar_pedido(
+    sessao: Session,
+    pedido_id: int,
+) -> PedidoResumoResposta:
+    try:
+        pedido = sessao.scalar(
+            select(Pedido)
+            .where(Pedido.id == pedido_id)
+            .with_for_update()
+        )
+
+        if pedido is None:
+            raise PedidoNaoEncontradoError()
+
+        if pedido.status != "RECEBIDO":
+            raise CancelamentoPedidoInvalidoError(
+                "Somente pedidos em RECEBIDO podem ser cancelados."
+            )
+
+        itens = sessao.scalars(
+            select(ItemPedido)
+            .where(ItemPedido.pedido_id == pedido.id)
+            .order_by(ItemPedido.produto_id)
+        ).all()
+
+        for item in itens:
+            produto = sessao.scalar(
+                select(Produto)
+                .where(Produto.id == item.produto_id)
+                .with_for_update()
+            )
+
+            if produto is None:
+                raise CancelamentoPedidoInvalidoError(
+                    "Não foi possível localizar um produto do pedido."
+                )
+
+            novo_estoque = produto.estoque + item.quantidade
+
+            if novo_estoque > 2147483647:
+                raise CancelamentoPedidoInvalidoError(
+                    "A devolução ultrapassa o limite de estoque permitido."
+                )
+
+            produto.estoque = novo_estoque
+
+        pedido.status = "CANCELADO"
+        sessao.flush()
+
+        resposta = PedidoResumoResposta.model_validate(pedido)
+        sessao.commit()
+
+        return resposta
+
+    except Exception:
+        sessao.rollback()
+        raise

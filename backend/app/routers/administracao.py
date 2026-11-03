@@ -19,6 +19,8 @@ from app.services.pedido import (
     atualizar_status_preparo,
     buscar_pedido_administracao,
     listar_pedidos_administracao,
+    CancelamentoPedidoInvalidoError,
+    cancelar_pedido,    
 )
 
 
@@ -130,6 +132,36 @@ def alterar_status_preparo(
         ) from None
 
     except TransicaoPedidoInvalidaError as erro:
+        raise HTTPException(
+            status_code=409,
+            detail=str(erro),
+        ) from None
+
+@router.post(
+    "/pedidos/{pedido_id}/cancelar",
+    response_model=PedidoResumoResposta,
+    dependencies=[Depends(exigir_perfis("ADMINISTRADOR"))],
+)
+def cancelar_pedido_admin(
+    pedido_id: Annotated[
+        int,
+        Path(ge=1, le=18446744073709551615),
+    ],
+    sessao: Annotated[Session, Depends(obter_sessao)],
+):
+    try:
+        return cancelar_pedido(
+            sessao=sessao,
+            pedido_id=pedido_id,
+        )
+
+    except PedidoNaoEncontradoError:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado.",
+        ) from None
+
+    except CancelamentoPedidoInvalidoError as erro:
         raise HTTPException(
             status_code=409,
             detail=str(erro),
