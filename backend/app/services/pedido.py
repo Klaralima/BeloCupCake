@@ -5,7 +5,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Bairro, ItemPedido, Pedido, Produto, RegiaoEntrega
-from app.schemas.pedido import PedidoCriar, PedidoResumoResposta
+from app.schemas.pedido import (
+    ItemPedidoResposta,
+    PedidoCriar,
+    PedidoDetalheResposta,
+    PedidoResumoResposta,
+)
 
 
 class PedidoInvalidoError(Exception):
@@ -135,3 +140,42 @@ def listar_pedidos_cliente(
     )
 
     return list(sessao.scalars(consulta).all())
+
+def buscar_pedido_cliente(
+    sessao: Session,
+    pedido_id: int,
+    cliente_id: int,
+) -> PedidoDetalheResposta | None:
+    pedido = sessao.scalar(
+        select(Pedido).where(
+            Pedido.id == pedido_id,
+            Pedido.cliente_id == cliente_id,
+        )
+    )
+
+    if pedido is None:
+        return None
+
+    itens = sessao.scalars(
+        select(ItemPedido)
+        .where(ItemPedido.pedido_id == pedido.id)
+        .order_by(ItemPedido.id)
+    ).all()
+
+    resumo = PedidoResumoResposta.model_validate(pedido)
+
+    return PedidoDetalheResposta(
+        **resumo.model_dump(),
+        bairro_id=pedido.bairro_id,
+        logradouro=pedido.logradouro,
+        numero=pedido.numero,
+        complemento=pedido.complemento,
+        cep=pedido.cep,
+        bairro_nome=pedido.bairro_nome,
+        cidade=pedido.cidade,
+        uf=pedido.uf,
+        itens=[
+            ItemPedidoResposta.model_validate(item)
+            for item in itens
+        ],
+    )

@@ -76,3 +76,24 @@ class PedidoResumoResposta(BaseModel):
     valor_total: Decimal
     criado_em: datetime
     previsao_entrega: datetime
+
+class ItemPedidoResposta(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    produto_id: int
+    nome_produto: str
+    quantidade: int
+    preco_unitario: Decimal
+
+
+class PedidoDetalheResposta(PedidoResumoResposta):
+    bairro_id: int
+    logradouro: str
+    numero: str
+    complemento: str | None
+    cep: str
+    bairro_nome: str
+    cidade: str
+    uf: str
+    itens: list[ItemPedidoResposta]

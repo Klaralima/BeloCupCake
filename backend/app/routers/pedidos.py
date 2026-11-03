@@ -1,14 +1,19 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import obter_sessao
 from app.dependencies import exigir_perfis
 from app.models.usuario import Usuario
-from app.schemas.pedido import PedidoCriar, PedidoResumoResposta
+from app.schemas.pedido import (
+    PedidoCriar,
+    PedidoDetalheResposta,
+    PedidoResumoResposta,
+)
 from app.services.pedido import (
     PedidoInvalidoError,
+    buscar_pedido_cliente,
     criar_pedido,
     listar_pedidos_cliente,
 )
@@ -58,3 +63,29 @@ def consultar_meus_pedidos(
         limite=limite,
         deslocamento=deslocamento,
     )
+
+@router.get("/{pedido_id}", response_model=PedidoDetalheResposta)
+def consultar_meu_pedido(
+    pedido_id: Annotated[
+        int,
+        Path(ge=1, le=18446744073709551615),
+    ],
+    usuario: Annotated[
+        Usuario,
+        Depends(exigir_perfis("CLIENTE")),
+    ],
+    sessao: Annotated[Session, Depends(obter_sessao)],
+):
+    pedido = buscar_pedido_cliente(
+        sessao=sessao,
+        pedido_id=pedido_id,
+        cliente_id=usuario.id,
+    )
+
+    if pedido is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado.",
+        )
+
+    return pedido
