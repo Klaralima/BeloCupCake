@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from decimal import Decimal
 
 
 class BairroCriar(BaseModel):
@@ -33,3 +34,11 @@ class BairroResposta(BaseModel):
     cidade: str
     uf: str
     ativo: bool
+
+class BairroDisponivelResposta(BaseModel):
+    id: int
+    nome: str
+    cidade: str
+    uf: str
+    taxa_entrega: Decimal
+    prazo_minutos: int

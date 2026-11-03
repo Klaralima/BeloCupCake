@@ -57,3 +57,32 @@ def cadastrar_bairro(sessao: Session, dados: BairroCriar) -> Bairro:
 
     sessao.refresh(bairro)
     return bairro
+
+def listar_bairros_disponiveis(
+    sessao: Session,
+    limite: int,
+    deslocamento: int,
+):
+    consulta = (
+        select(
+            Bairro.id,
+            Bairro.nome,
+            Bairro.cidade,
+            Bairro.uf,
+            RegiaoEntrega.taxa.label("taxa_entrega"),
+            RegiaoEntrega.prazo_minutos,
+        )
+        .join(
+            RegiaoEntrega,
+            RegiaoEntrega.id == Bairro.regiao_entrega_id,
+        )
+        .where(
+            Bairro.ativo.is_(True),
+            RegiaoEntrega.ativo.is_(True),
+        )
+        .order_by(Bairro.cidade, Bairro.nome, Bairro.id)
+        .offset(deslocamento)
+        .limit(limite)
+    )
+
+    return sessao.execute(consulta).mappings().all()
