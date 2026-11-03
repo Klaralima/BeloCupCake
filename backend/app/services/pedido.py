@@ -141,21 +141,10 @@ def listar_pedidos_cliente(
 
     return list(sessao.scalars(consulta).all())
 
-def buscar_pedido_cliente(
+def _montar_detalhes_pedido(
     sessao: Session,
-    pedido_id: int,
-    cliente_id: int,
-) -> PedidoDetalheResposta | None:
-    pedido = sessao.scalar(
-        select(Pedido).where(
-            Pedido.id == pedido_id,
-            Pedido.cliente_id == cliente_id,
-        )
-    )
-
-    if pedido is None:
-        return None
-
+    pedido: Pedido,
+) -> PedidoDetalheResposta:
     itens = sessao.scalars(
         select(ItemPedido)
         .where(ItemPedido.pedido_id == pedido.id)
@@ -179,6 +168,36 @@ def buscar_pedido_cliente(
             for item in itens
         ],
     )
+
+
+def buscar_pedido_cliente(
+    sessao: Session,
+    pedido_id: int,
+    cliente_id: int,
+) -> PedidoDetalheResposta | None:
+    pedido = sessao.scalar(
+        select(Pedido).where(
+            Pedido.id == pedido_id,
+            Pedido.cliente_id == cliente_id,
+        )
+    )
+
+    if pedido is None:
+        return None
+
+    return _montar_detalhes_pedido(sessao, pedido)
+
+
+def buscar_pedido_administracao(
+    sessao: Session,
+    pedido_id: int,
+) -> PedidoDetalheResposta | None:
+    pedido = sessao.get(Pedido, pedido_id)
+
+    if pedido is None:
+        return None
+
+    return _montar_detalhes_pedido(sessao, pedido)
 
 def listar_pedidos_administracao(
     sessao: Session,

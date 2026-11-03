@@ -1,14 +1,21 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from app.dependencies import exigir_perfis
 from app.models.usuario import Usuario
 from app.database import obter_sessao
 from app.schemas.produto import ProdutoResposta
 from app.services.produto import listar_produtos_administracao
-from app.schemas.pedido import PedidoResumoResposta, StatusPedido
-from app.services.pedido import listar_pedidos_administracao
+from app.schemas.pedido import (
+    PedidoDetalheResposta,
+    PedidoResumoResposta,
+    StatusPedido,
+)
+from app.services.pedido import (
+    buscar_pedido_administracao,
+    listar_pedidos_administracao,
+)
 
 
 router = APIRouter(
@@ -66,3 +73,28 @@ def consultar_pedidos_admin(
         limite=limite,
         deslocamento=deslocamento,
     )
+
+@router.get(
+    "/pedidos/{pedido_id}",
+    response_model=PedidoDetalheResposta,
+    dependencies=[Depends(exigir_perfis("ADMINISTRADOR"))],
+)
+def consultar_pedido_admin(
+    pedido_id: Annotated[
+        int,
+        Path(ge=1, le=18446744073709551615),
+    ],
+    sessao: Annotated[Session, Depends(obter_sessao)],
+):
+    pedido = buscar_pedido_administracao(
+        sessao=sessao,
+        pedido_id=pedido_id,
+    )
+
+    if pedido is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado.",
+        )
+
+    return pedido
