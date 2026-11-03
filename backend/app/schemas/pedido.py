@@ -1,4 +1,6 @@
 from typing import Self
+from datetime import datetime
+from decimal import Decimal
 
 from pydantic import (
     BaseModel,
@@ -62,3 +64,15 @@ class PedidoCriar(BaseModel):
             )
 
         return self
+
+class PedidoResumoResposta(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    cliente_id: int
+    status: str
+    subtotal: Decimal
+    taxa_entrega: Decimal
+    valor_total: Decimal
+    criado_em: datetime
+    previsao_entrega: datetime
