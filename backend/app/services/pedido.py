@@ -119,3 +119,19 @@ def criar_pedido(
     except Exception:
         sessao.rollback()
         raise
+
+def listar_pedidos_cliente(
+    sessao: Session,
+    cliente_id: int,
+    limite: int,
+    deslocamento: int,
+) -> list[Pedido]:
+    consulta = (
+        select(Pedido)
+        .where(Pedido.cliente_id == cliente_id)
+        .order_by(Pedido.criado_em.desc(), Pedido.id.desc())
+        .offset(deslocamento)
+        .limit(limite)
+    )
+
+    return list(sessao.scalars(consulta).all())
