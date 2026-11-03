@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Literal, Self
 from datetime import datetime
 from decimal import Decimal
 
@@ -10,6 +10,16 @@ from pydantic import (
     model_validator,
 )
 
+
+StatusPedido = Literal[
+    "RECEBIDO",
+    "EM_PREPARO",
+    "PRONTO",
+    "ATRIBUIDA",
+    "EM_ROTA",
+    "ENTREGUE",
+    "CANCELADO",
+]
 
 class ItemPedidoCriar(BaseModel):
     model_config = ConfigDict(extra="forbid")

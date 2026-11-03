@@ -179,3 +179,23 @@ def buscar_pedido_cliente(
             for item in itens
         ],
     )
+
+def listar_pedidos_administracao(
+    sessao: Session,
+    status_pedido: str | None,
+    limite: int,
+    deslocamento: int,
+) -> list[Pedido]:
+    consulta = select(Pedido)
+
+    if status_pedido is not None:
+        consulta = consulta.where(Pedido.status == status_pedido)
+
+    consulta = (
+        consulta
+        .order_by(Pedido.criado_em.desc(), Pedido.id.desc())
+        .offset(deslocamento)
+        .limit(limite)
+    )
+
+    return list(sessao.scalars(consulta).all())
