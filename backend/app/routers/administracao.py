@@ -10,9 +10,13 @@ from app.services.produto import listar_produtos_administracao
 from app.schemas.pedido import (
     PedidoDetalheResposta,
     PedidoResumoResposta,
+    PedidoStatusAtualizar,
     StatusPedido,
 )
 from app.services.pedido import (
+    PedidoNaoEncontradoError,
+    TransicaoPedidoInvalidaError,
+    atualizar_status_preparo,
     buscar_pedido_administracao,
     listar_pedidos_administracao,
 )
@@ -98,3 +102,35 @@ def consultar_pedido_admin(
         )
 
     return pedido
+
+@router.patch(
+    "/pedidos/{pedido_id}/status",
+    response_model=PedidoResumoResposta,
+    dependencies=[Depends(exigir_perfis("ADMINISTRADOR"))],
+)
+def alterar_status_preparo(
+    pedido_id: Annotated[
+        int,
+        Path(ge=1, le=18446744073709551615),
+    ],
+    dados: PedidoStatusAtualizar,
+    sessao: Annotated[Session, Depends(obter_sessao)],
+):
+    try:
+        return atualizar_status_preparo(
+            sessao=sessao,
+            pedido_id=pedido_id,
+            novo_status=dados.status,
+        )
+
+    except PedidoNaoEncontradoError:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado.",
+        ) from None
+
+    except TransicaoPedidoInvalidaError as erro:
+        raise HTTPException(
+            status_code=409,
+            detail=str(erro),
+        ) from None

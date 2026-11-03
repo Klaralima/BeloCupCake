@@ -107,3 +107,8 @@ class PedidoDetalheResposta(PedidoResumoResposta):
     cidade: str
     uf: str
     itens: list[ItemPedidoResposta]
+
+class PedidoStatusAtualizar(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: Literal["EM_PREPARO", "PRONTO"]

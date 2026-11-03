@@ -218,3 +218,52 @@ def listar_pedidos_administracao(
     )
 
     return list(sessao.scalars(consulta).all())
+
+class PedidoNaoEncontradoError(Exception):
+    pass
+
+
+class TransicaoPedidoInvalidaError(Exception):
+    pass
+
+
+TRANSICOES_PREPARO = {
+    "RECEBIDO": "EM_PREPARO",
+    "EM_PREPARO": "PRONTO",
+}
+
+
+def atualizar_status_preparo(
+    sessao: Session,
+    pedido_id: int,
+    novo_status: str,
+) -> PedidoResumoResposta:
+    try:
+        pedido = sessao.scalar(
+            select(Pedido)
+            .where(Pedido.id == pedido_id)
+            .with_for_update()
+        )
+
+        if pedido is None:
+            raise PedidoNaoEncontradoError()
+
+        proximo_status = TRANSICOES_PREPARO.get(pedido.status)
+
+        if novo_status != proximo_status:
+            raise TransicaoPedidoInvalidaError(
+                f"Não é permitido alterar de "
+                f"{pedido.status} para {novo_status}."
+            )
+
+        pedido.status = novo_status
+        sessao.flush()
+
+        resposta = PedidoResumoResposta.model_validate(pedido)
+        sessao.commit()
+
+        return resposta
+
+    except Exception:
+        sessao.rollback()
+        raise
