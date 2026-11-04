@@ -11,6 +11,7 @@ from app.routers.regioes import router as regioes_router
 from app.routers.bairros import router as bairros_router
 from app.routers.bairros_publicos import router as bairros_publicos_router
 from app.routers.pedidos import router as pedidos_router
+from app.routers.entregas import router as entregas_router
 
 
 app = FastAPI(
@@ -27,6 +28,7 @@ app.include_router(regioes_router)
 app.include_router(bairros_router)
 app.include_router(bairros_publicos_router)
 app.include_router(pedidos_router)
+app.include_router(entregas_router)
 
 @app.get("/health", tags=["Sistema"])
 def verificar_api():
