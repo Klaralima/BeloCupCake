@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.database import obter_sessao
 from app.dependencies import exigir_perfis, obter_usuario_atual
 from app.models.usuario import Usuario
-from app.schemas.entrega import EntregaDisponivelResposta, EntregaAceitaResposta, EntregaIniciadaResposta
-from app.services.entrega import listar_entregas_disponiveis, aceitar_entrega, iniciar_entrega
+from app.schemas.entrega import EntregaDisponivelResposta, EntregaAceitaResposta, EntregaIniciadaResposta, EntregaConcluidaResposta
+from app.services.entrega import listar_entregas_disponiveis, aceitar_entrega, iniciar_entrega, concluir_entrega
 
 
 router = APIRouter(
@@ -59,6 +59,22 @@ def iniciar_entrega_do_pedido(
     usuario_atual: Usuario = Depends(obter_usuario_atual),
 ):
     return iniciar_entrega(
+        sessao=sessao,
+        pedido_id=pedido_id,
+        entregador_id=usuario_atual.id,
+    )
+
+@router.post(
+    "/{pedido_id}/concluir",
+    response_model=EntregaConcluidaResposta,
+    status_code=200,
+)
+def concluir_entrega_do_pedido(
+    pedido_id: int,
+    sessao: Session = Depends(obter_sessao),
+    usuario_atual: Usuario = Depends(obter_usuario_atual),
+):
+    return concluir_entrega(
         sessao=sessao,
         pedido_id=pedido_id,
         entregador_id=usuario_atual.id,

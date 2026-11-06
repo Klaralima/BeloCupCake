@@ -23,3 +23,9 @@ class EntregaIniciadaResposta(BaseModel):
     entregador_id: int
     status: str
     saida_em: datetime
+
+class EntregaConcluidaResposta(BaseModel):
+    pedido_id: int
+    entregador_id: int
+    status: str
+    entregue_em: datetime
