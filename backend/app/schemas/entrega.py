@@ -9,10 +9,17 @@ class EntregaDisponivelResposta(BaseModel):
     cidade: str
     uf: str
     previsao_entrega: datetime
-    
+
 
 class EntregaAceitaResposta(BaseModel):
     pedido_id: int
     entregador_id: int
     status: str
     aceita_em: datetime
+
+
+class EntregaIniciadaResposta(BaseModel):
+    pedido_id: int
+    entregador_id: int
+    status: str
+    saida_em: datetime
