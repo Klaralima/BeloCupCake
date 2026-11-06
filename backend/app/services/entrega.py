@@ -6,8 +6,7 @@ from datetime import datetime, timezone
 
 from app.models import Entrega, Pedido
 from app.models.usuario import Usuario
-from app.schemas.entrega import EntregaAceitaResposta, EntregaIniciadaResposta, EntregaConcluidaResposta
-
+from app.schemas.entrega import EntregaAceitaResposta, EntregaIniciadaResposta, EntregaConcluidaResposta, MinhaEntregaResposta
 
 def listar_entregas_disponiveis(
     sessao: Session,
@@ -255,3 +254,39 @@ def concluir_entrega(
     except SQLAlchemyError:
         sessao.rollback()
         raise
+
+def listar_minhas_entregas(
+    sessao: Session,
+    entregador_id: int,
+    status: str | None,
+    limite: int,
+    deslocamento: int,
+) -> list[MinhaEntregaResposta]:
+    consulta = (
+        select(
+            Entrega.pedido_id,
+            Pedido.status,
+            Entrega.aceita_em,
+            Entrega.saida_em,
+            Entrega.entregue_em,
+        )
+        .join(Pedido, Pedido.id == Entrega.pedido_id)
+        .where(Entrega.entregador_id == entregador_id)
+    )
+
+    if status is not None:
+        consulta = consulta.where(Pedido.status == status)
+
+    consulta = (
+        consulta
+        .order_by(Entrega.aceita_em.desc(), Entrega.id.desc())
+        .limit(limite)
+        .offset(deslocamento)
+    )
+
+    registros = sessao.execute(consulta).mappings().all()
+
+    return [
+        MinhaEntregaResposta(**registro)
+        for registro in registros
+    ]

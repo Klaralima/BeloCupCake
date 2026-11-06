@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.database import obter_sessao
 from app.dependencies import exigir_perfis, obter_usuario_atual
 from app.models.usuario import Usuario
-from app.schemas.entrega import EntregaDisponivelResposta, EntregaAceitaResposta, EntregaIniciadaResposta, EntregaConcluidaResposta
-from app.services.entrega import listar_entregas_disponiveis, aceitar_entrega, iniciar_entrega, concluir_entrega
+from app.schemas.entrega import EntregaDisponivelResposta, EntregaAceitaResposta, EntregaIniciadaResposta, EntregaConcluidaResposta, MinhaEntregaResposta
+from app.services.entrega import listar_entregas_disponiveis, aceitar_entrega, iniciar_entrega, concluir_entrega, listar_minhas_entregas
 
 
 router = APIRouter(
@@ -78,4 +78,25 @@ def concluir_entrega_do_pedido(
         sessao=sessao,
         pedido_id=pedido_id,
         entregador_id=usuario_atual.id,
+    )
+
+@router.get(
+    "/minhas",
+    response_model=list[MinhaEntregaResposta],
+)
+def consultar_minhas_entregas(
+    sessao: Session = Depends(obter_sessao),
+    usuario_atual: Usuario = Depends(obter_usuario_atual),
+    status: Literal["ATRIBUIDA", "EM_ROTA", "ENTREGUE"] | None = Query(
+        default=None,
+    ),
+    limite: int = Query(default=20, ge=1, le=100),
+    deslocamento: int = Query(default=0, ge=0),
+):
+    return listar_minhas_entregas(
+        sessao=sessao,
+        entregador_id=usuario_atual.id,
+        status=status,
+        limite=limite,
+        deslocamento=deslocamento,
     )

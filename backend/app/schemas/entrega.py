@@ -29,3 +29,10 @@ class EntregaConcluidaResposta(BaseModel):
     entregador_id: int
     status: str
     entregue_em: datetime
+
+class MinhaEntregaResposta(BaseModel):
+    pedido_id: int
+    status: str
+    aceita_em: datetime
+    saida_em: datetime | None
+    entregue_em: datetime | None
