@@ -11,7 +11,7 @@ Aplicação web responsiva desenvolvida como projeto acadêmico de Engenharia de
 | Swagger da API | https://belocupcake-api.duckdns.org/docs |
 | Saúde da API | https://belocupcake-api.duckdns.org/health |
 | Conexão com o banco | https://belocupcake-api.duckdns.org/health/db |
-| Código do frontend | https://github.com/Klaralima/pixel-perfect-replica |
+| Código do frontend | https://github.com/Klaralima/BeloCupCake-frontend |
 
 O endereço DuckDNS atende a API. A interface com catálogo, login e pedidos é publicada no Lovable. Não há redirecionamento da raiz da API para a interface previsto no código.
 
