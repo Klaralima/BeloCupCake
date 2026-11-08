@@ -17,7 +17,7 @@ O endereço DuckDNS atende a API. A interface com catálogo, login e pedidos é 
 
 ## Situação da versão
 
-Em 08/11/2026, a responsável pelo projeto confirmou o teste manual do fluxo publicado, incluindo cadastro, compra, aceite e conclusão da entrega. As últimas verificações locais registraram 7 testes do backend, 8 testes do frontend, verificação TypeScript e compilação do frontend aprovados. Os testes automatizados usam dependências simuladas e não substituem o teste integrado com MySQL.
+Em 08/11/2026, realizei um teste manual do fluxo, incluindo cadastro, compra, aceite e conclusão da entrega. As últimas verificações locais registraram 7 testes do backend, 8 testes do frontend, verificação TypeScript e compilação do frontend aprovados. Os testes automatizados usam dependências simuladas e não substituem o teste integrado com MySQL.
 
 ## Funcionalidades
 
