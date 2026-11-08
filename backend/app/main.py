@@ -64,6 +64,7 @@ def verificar_banco():
 origens_permitidas = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://screenshot-soul-studio-36.lovable.app",
 ]
 
 app.add_middleware(
