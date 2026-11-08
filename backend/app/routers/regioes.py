@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import obter_sessao
@@ -9,7 +9,7 @@ from app.schemas.regiao_entrega import (
     RegiaoEntregaCriar,
     RegiaoEntregaResposta,
 )
-from app.services.regiao_entrega import cadastrar_regiao
+from app.services.regiao_entrega import cadastrar_regiao, listar_regioes
 
 
 router = APIRouter(
@@ -29,3 +29,12 @@ def criar_regiao(
     sessao: Annotated[Session, Depends(obter_sessao)],
 ):
     return cadastrar_regiao(sessao, dados)
+
+
+@router.get("", response_model=list[RegiaoEntregaResposta])
+def consultar_regioes(
+    sessao: Annotated[Session, Depends(obter_sessao)],
+    limite: Annotated[int, Query(ge=1, le=100)] = 20,
+    deslocamento: Annotated[int, Query(ge=0)] = 0,
+):
+    return listar_regioes(sessao, limite, deslocamento)

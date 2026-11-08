@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -26,3 +27,11 @@ def cadastrar_regiao(
 
     sessao.refresh(regiao)
     return regiao
+
+def listar_regioes(sessao: Session, limite: int, deslocamento: int):
+    return list(sessao.scalars(
+        select(RegiaoEntrega)
+        .order_by(RegiaoEntrega.nome, RegiaoEntrega.id)
+        .offset(deslocamento)
+        .limit(limite)
+    ).all())
