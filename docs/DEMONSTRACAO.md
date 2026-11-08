@@ -7,7 +7,7 @@ Projeto acadêmico de Engenharia de Software: aplicação web responsiva para co
 - Aplicação: https://screenshot-soul-studio-36.lovable.app
 - API e documentação interativa: https://belocupcake-api.duckdns.org/docs
 - Backend: https://github.com/Klaralima/BeloCupCake
-- Frontend: https://github.com/Klaralima/pixel-perfect-replica
+- Frontend: https://github.com/Klaralima/BeloCupCake-frontend
 - Hospedagem: Lovable (frontend) e VPS Hostinger (FastAPI e MySQL).
 
 O DuckDNS fornece o nome de acesso à API. Não hospeda o código nem o banco.
