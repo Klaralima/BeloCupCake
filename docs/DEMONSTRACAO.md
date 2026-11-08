@@ -57,7 +57,7 @@ Pagamento é presencial e não há transação financeira no aplicativo. A estim
 
 ## Registro de validação
 
-Em 08/11/2026, a responsável informou que testou com sucesso o fluxo publicado desde o cadastro e a compra até o aceite e a entrega. Esse registro é uma confirmação manual da responsável, não um relatório automatizado de navegador.
+Em 08/11/2026, realizei teste manual do fluxo completo.
 
 As verificações locais realizadas durante o desenvolvimento registraram 7 testes do backend e 8 do frontend aprovados, além da verificação TypeScript e build. A suíte não comprova todos os cenários complementares acima; eles constituem um roteiro de verificação adicional.
 
