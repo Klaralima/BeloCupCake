@@ -4,7 +4,7 @@ from decimal import Decimal
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Bairro, ItemPedido, Pedido, Produto, RegiaoEntrega
+from app.models import Bairro, Entrega, ItemPedido, Pedido, Produto, RegiaoEntrega
 from app.schemas.pedido import (
     ItemPedidoResposta,
     PedidoCriar,
@@ -329,3 +329,17 @@ def cancelar_pedido(
     except Exception:
         sessao.rollback()
         raise
+
+def buscar_pedido_entregador(
+    sessao: Session,
+    pedido_id: int,
+    entregador_id: int,
+) -> PedidoDetalheResposta | None:
+    pedido = sessao.scalar(
+        select(Pedido)
+        .join(Entrega, Entrega.pedido_id == Pedido.id)
+        .where(Pedido.id == pedido_id, Entrega.entregador_id == entregador_id)
+    )
+    if pedido is None:
+        return None
+    return _montar_detalhes_pedido(sessao, pedido)
