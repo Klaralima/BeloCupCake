@@ -1,11 +1,13 @@
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.orm import Session
 
 from app.database import obter_sessao
 from app.dependencies import exigir_perfis, obter_usuario_atual
 from app.models.usuario import Usuario
+from app.schemas.pedido import PedidoDetalheResposta
+from app.services.pedido import buscar_pedido_entregador
 from app.schemas.entrega import EntregaDisponivelResposta, EntregaAceitaResposta, EntregaIniciadaResposta, EntregaConcluidaResposta, MinhaEntregaResposta
 from app.services.entrega import listar_entregas_disponiveis, aceitar_entrega, iniciar_entrega, concluir_entrega, listar_minhas_entregas
 
@@ -100,3 +102,15 @@ def consultar_minhas_entregas(
         limite=limite,
         deslocamento=deslocamento,
     )
+
+
+@router.get("/{pedido_id}", response_model=PedidoDetalheResposta)
+def consultar_detalhes_entrega(
+    pedido_id: Annotated[int, Path(ge=1)],
+    sessao: Session = Depends(obter_sessao),
+    usuario_atual: Usuario = Depends(obter_usuario_atual),
+):
+    pedido = buscar_pedido_entregador(sessao, pedido_id, usuario_atual.id)
+    if pedido is None:
+        raise HTTPException(status_code=404, detail="Entrega não encontrada para sua conta.")
+    return pedido
